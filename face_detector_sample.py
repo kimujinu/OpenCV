@@ -1,10 +1,11 @@
 import cv2, dlib, sys
 import numpy as np
 
-scaler = 0.3
+scaler = 0.3 # 동영상 크기 조절 변수
 
 # initialize face detector and shape predictor
 detector = dlib.get_frontal_face_detector()
+# 68개의 얼굴 특징점 추출 모델
 predictor = dlib.shape_predictor('shape_predictor_68_face_landmark.dat')
 
 # load video
@@ -51,7 +52,7 @@ while True:
     if not ret:
         break
 
-    # resize frame
+    # 이미지 크기 조정
     img = cv2.resize(img, (int(img.shape[1] * scaler), int(img.shape[0] * scaler)))
     ori = img.copy()
 
@@ -61,6 +62,7 @@ while True:
     else:
         roi_img = img[face_roi[0]:face_roi[1], face_roi[2]:face_roi[3]]
         # cv2.imshow('roi', roi_img)
+        # 얼굴 인식
         faces = detector(roi_img)
 
     # no faces
@@ -69,6 +71,7 @@ while True:
 
     # find facial landmarks
     for face in faces:
+        # 특징점 추출 반복문
         if len(face_roi) == 0:
             dlib_shape = predictor(img, face)
             shape_2d = np.array([[p.x, p.y] for p in dlib_shape.parts()])
@@ -97,7 +100,7 @@ while True:
             del face_sizes[0]
         mean_face_size = int(np.mean(face_sizes) * 1.8)
 
-        # compute face roi
+        # compute face roi, 얼굴의 중심점을 구함
         face_roi = np.array([int(min_coords[1] - face_size / 2), int(max_coords[1] + face_size / 2), int(min_coords[0] - face_size / 2), int(max_coords[0] + face_size / 2)])
         face_roi = np.clip(face_roi, 0, 10000)
 
